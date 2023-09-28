@@ -2,9 +2,21 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 import n3 from "./db/n3.json";
+import AppLoading from "expo-app-loading";
+
 import { TouchableOpacity } from "react-native";
+import {
+  useFonts,
+  NotoSerifJP_500Medium,
+} from "@expo-google-fonts/noto-serif-jp";
 
 export default function App() {
+  let [fontsLoaded] = useFonts({
+    NotoSerifJP_500Medium,
+  });
+  let fontSize = 24;
+  let paddingVertical = 6;
+
   const [randomSelection, setRandomSelection] = useState([]);
 
   const getRandomObjects = (arr, count) => {
@@ -30,12 +42,23 @@ export default function App() {
   };
 
   console.log("test", randomSelection);
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
 
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
       <TouchableOpacity onPress={handleRandomSelection}>
-        <Text>Start</Text>
+        <Text
+          style={{
+            fontSize,
+            paddingVertical,
+            fontFamily: "NotoSerifJP_500Medium",
+          }}
+        >
+          Start 香り
+        </Text>
       </TouchableOpacity>
       <StatusBar style="auto" />
     </View>
