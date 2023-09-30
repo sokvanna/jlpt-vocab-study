@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "jlpt-vocab-study",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -30,6 +31,9 @@
       "eas": {
         "projectId": "bc979306-e8f5-4dbe-a93b-a0f488db5ad3"
       }
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
