@@ -6,11 +6,13 @@ import { TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
-  let fontSize = 24;
-  let paddingVertical = 6;
+  let fontSize = 50;
+  let paddingVertical = 1;
 
   const [vocabulary, setVocabulary] = useState([]);
   const [randomSelection, setRandomSelection] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState([]);
 
   const getRandomObjects = (arr, count) => {
     const selectedObjects = [];
@@ -32,6 +34,7 @@ export default function App() {
   const handleRandomSelection = () => {
     const newRandomSelection = getRandomObjects(n3, 40);
     setRandomSelection(newRandomSelection);
+    getAnswers(newRandomSelection);
   };
 
   const setInitialState = () => {
@@ -76,21 +79,140 @@ export default function App() {
     console.log("Done.");
   };
 
+  const onAnswer = (a) => {
+    if (a.word === randomSelection[current].word) {
+      console.log("CORRECT");
+    } else {
+      console.log("FALSE");
+    }
+  };
+  const getRandomNumberExcluding = (min, max) => {
+    let randomNumber;
+
+    do {
+      randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+    } while (randomNumber === current);
+
+    return randomNumber;
+  };
+  const getAnswers = (newRandomSelection) => {
+    const randomNum1 = getRandomNumberExcluding(1, 40);
+    const randomNum2 = getRandomNumberExcluding(1, 40);
+    const randomNum3 = getRandomNumberExcluding(1, 40);
+
+    const originalArray = [
+      newRandomSelection[current],
+      vocabulary[randomNum1],
+      vocabulary[randomNum2],
+      vocabulary[randomNum3],
+    ];
+    setAnswers(shuffleArray(originalArray));
+  };
+
+  const shuffleArray = (arr) => {
+    const shuffledArray = [...arr]; // Create a copy of the original array
+
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1)); // Generate a random index
+      [shuffledArray[i], shuffledArray[j]] = [
+        shuffledArray[j],
+        shuffledArray[i],
+      ]; // Swap elements at i and j
+    }
+
+    return shuffledArray; // Return the shuffled array
+  };
+
   useEffect(() => {
     getData();
   }, []);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handleRandomSelection}>
-        <Text
+      {randomSelection.length && answers.length > 0 ? (
+        <View
           style={{
-            fontSize,
-            paddingVertical,
-            fontFamily: "NotoSerifJP_500Medium",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          Start 香り
+          <Text
+            style={{
+              fontSize,
+              paddingVertical,
+              fontFamily: "NotoSerifJP_500Medium",
+            }}
+          >
+            {randomSelection[current].word}
+          </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            {answers.map((a, index) => {
+              return (
+                <TouchableOpacity
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "45%",
+                    height: 100,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 20,
+                    borderWidth: 1,
+                    borderColor: "#000",
+                    borderRadius: 10,
+                  }}
+                  key={index}
+                  onPress={() => onAnswer(a)}
+                >
+                  <Text>{a.romaji}</Text>
+                  <Text>{a.furigana}</Text>
+
+                  <Text
+                    style={{
+                      fontSize: 11,
+                    }}
+                  >
+                    {a.meaning}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      ) : null}
+      <TouchableOpacity
+        style={{
+          borderWidth: 1,
+          borderColor: "rgb(43, 153, 216)",
+          borderRadius: 10,
+          width: 200,
+          backgroundColor: "rgb(43, 153, 216)",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: 20,
+          marginBottom: 20,
+          height: 50,
+        }}
+        onPress={handleRandomSelection}
+      >
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 18,
+          }}
+        >
+          Shuffle
         </Text>
       </TouchableOpacity>
 
