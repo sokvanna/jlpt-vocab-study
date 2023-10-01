@@ -4,6 +4,8 @@ import {
   useFonts,
   NotoSerifJP_500Medium,
 } from "@expo-google-fonts/noto-serif-jp";
+import { FontAwesome } from "@expo/vector-icons";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function AppLayout() {
   let [fontsLoaded] = useFonts({
@@ -13,21 +15,30 @@ export default function AppLayout() {
     return <View />;
   }
   return (
-    <Tabs>
-      <Tabs.Screen
-        name="index"
-        options={{
-          href: "/",
-          tabBarIconStyle: { display: "none" },
-        }}
-      />
-      <Tabs.Screen
-        name="scoreboard"
-        options={{
-          href: "/scoreboard",
-          tabBarIconStyle: { display: "none" },
-        }}
-      />
-    </Tabs>
+    <SafeAreaProvider>
+      <Tabs>
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            href: "/",
+            tabBarIcon: () => <FontAwesome size={20} name="home" />,
+            tabBarLabelStyle: {
+              fontSize: 12,
+              fontWeight: "bold",
+            },
+          }}
+        />
+        <Tabs.Screen
+          name="scoreboard"
+          options={{
+            title: "Scoreboard",
+            href: "/scoreboard",
+            tabBarIcon: () => <FontAwesome size={20} name="clipboard" />,
+            tabBarLabelStyle: { fontSize: 12, fontWeight: "bold" },
+          }}
+        />
+      </Tabs>
+    </SafeAreaProvider>
   );
 }
