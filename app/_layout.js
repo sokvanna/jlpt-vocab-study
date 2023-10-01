@@ -32,7 +32,7 @@ export default function AppLayout() {
         <Tabs.Screen
           name="scoreboard"
           options={{
-            title: "Scoreboard",
+            title: `Scoreboard`,
             href: "/scoreboard",
             tabBarIcon: () => <FontAwesome size={20} name="clipboard" />,
             tabBarLabelStyle: { fontSize: 12, fontWeight: "bold" },

@@ -1,37 +1,56 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
+import { Text, View, FlatList } from "react-native";
 
 export default function Scoreboard() {
   const [vocabulary, setVocabulary] = useState([]);
+  const [isRefreshing, setRefreshing] = useState(false);
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem("n3Vocab");
       if (jsonValue !== null) {
         setVocabulary(JSON.parse(jsonValue));
+        setRefreshing(false);
       }
     } catch (e) {}
   };
 
   useEffect(() => {
+    setRefreshing(true);
     getData();
   }, []);
 
+  const Item = ({ word, score }) => (
+    <View
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: 20,
+        borderBottomWidth: 1,
+        borderColor: "#dbdbdb",
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 18,
+          fontFamily: "NotoSerifJP_500Medium",
+        }}
+      >
+        {word}
+      </Text>
+      <Text>{score} / 10</Text>
+    </View>
+  );
+
   return (
-    <ScrollView>
-      {vocabulary.map((v, index) => {
-        return (
-          <Text key={index}>
-            {v.word} {v.score}
-          </Text>
-        );
-      })}
-    </ScrollView>
+    <FlatList
+      onRefresh={() => getData()}
+      data={vocabulary.sort((a, b) => b.score - a.score)}
+      renderItem={({ item }) => <Item word={item.word} score={item.score} />}
+      keyExtractor={(item) => item.word}
+      refreshing={isRefreshing}
+    />
   );
 }

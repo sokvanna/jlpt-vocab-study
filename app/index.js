@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import n3 from "../db/n3.json";
 import { TouchableOpacity } from "react-native";
-
+import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
@@ -13,13 +13,26 @@ export default function App() {
   const [randomSelection, setRandomSelection] = useState([]);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState([]);
+  const [isCorrect, setIsCorrect] = useState(undefined);
+
+  const setInitialState = () => {
+    const vocabWithScore = n3.map(function (ele) {
+      return { ...ele, score: 0 };
+    });
+    storeData(vocabWithScore);
+    setVocabulary(vocabWithScore);
+    setIsCorrect(undefined);
+    setAnswers([]);
+    setCurrent(0);
+    setRandomSelection([]);
+  };
 
   const getRandomObjects = (arr, count) => {
     const selectedObjects = [];
     const copyOfArr = [...arr];
 
     if (count > arr.length) {
-      throw new Error("Count should not exceed the length of the array");
+      console.log("Count should not exceed the length of the array");
     }
 
     for (let i = 0; i < count; i++) {
@@ -32,17 +45,14 @@ export default function App() {
   };
 
   const handleRandomSelection = () => {
-    const newRandomSelection = getRandomObjects(n3, 40);
+    const newRandomSelection = getRandomObjects(
+      vocabulary.filter((w) => w.score < 10),
+      40
+    );
+    const currentAnswer = newRandomSelection[0];
+    setCurrent(0);
     setRandomSelection(newRandomSelection);
-    getAnswers(newRandomSelection);
-  };
-
-  const setInitialState = () => {
-    const vocabWithScore = n3.map(function (ele) {
-      return { ...ele, score: 0 };
-    });
-    storeData(vocabWithScore);
-    setVocabulary(vocabWithScore);
+    getAnswers(currentAnswer);
   };
 
   const storeData = async (value) => {
@@ -81,9 +91,40 @@ export default function App() {
 
   const onAnswer = (a) => {
     if (a.word === randomSelection[current].word) {
-      console.log("CORRECT");
+      setIsCorrect(true);
+      const vocabArry = [...vocabulary];
+      const index = vocabulary.findIndex((v) => v.word === a.word);
+      vocabArry[index].score = Number(vocabArry[index].score) + 1;
+      setVocabulary(vocabArry);
+      storeData(vocabArry);
     } else {
-      console.log("FALSE");
+      setIsCorrect(false);
+      const vocabArry = [...vocabulary];
+      const index = vocabulary.findIndex((v) => v.word === a.word);
+
+      vocabArry[index].score =
+        Number(vocabArry[index].score) === 0
+          ? Number(vocabArry[index].score)
+          : Number(vocabArry[index].score) - 1;
+      setVocabulary(vocabArry);
+      storeData(vocabArry);
+    }
+    let nextCurrent = current + 1;
+    if (nextCurrent < 40) {
+      setTimeout(() => {
+        setIsCorrect(undefined);
+        getAnswers(randomSelection[nextCurrent]);
+        setCurrent(nextCurrent);
+      }, 1500);
+    } else {
+      Alert.alert("Finished", "reshuffle to play again", [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => console.log("OK Pressed") },
+      ]);
     }
   };
   const getRandomNumberExcluding = (min, max) => {
@@ -95,13 +136,13 @@ export default function App() {
 
     return randomNumber;
   };
-  const getAnswers = (newRandomSelection) => {
-    const randomNum1 = getRandomNumberExcluding(1, 40);
-    const randomNum2 = getRandomNumberExcluding(1, 40);
-    const randomNum3 = getRandomNumberExcluding(1, 40);
+  const getAnswers = (currentAnswer) => {
+    const randomNum1 = getRandomNumberExcluding(0, 39);
+    const randomNum2 = getRandomNumberExcluding(0, 39);
+    const randomNum3 = getRandomNumberExcluding(0, 39);
 
     const originalArray = [
-      newRandomSelection[current],
+      currentAnswer,
       vocabulary[randomNum1],
       vocabulary[randomNum2],
       vocabulary[randomNum3],
@@ -129,7 +170,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {randomSelection.length && answers.length > 0 ? (
+      {randomSelection.length && answers.length > 0 && current <= 39 ? (
         <View
           style={{
             display: "flex",
@@ -138,6 +179,18 @@ export default function App() {
             alignItems: "center",
           }}
         >
+          {isCorrect === false ? (
+            <Text
+              style={{
+                color: "red",
+                fontSize: 18,
+                position: "relative",
+                top: 20,
+              }}
+            >
+              {randomSelection[current].romaji}
+            </Text>
+          ) : null}
           <Text
             style={{
               fontSize,
@@ -164,17 +217,28 @@ export default function App() {
                     display: "flex",
                     flexDirection: "column",
                     width: "45%",
-                    height: 100,
+                    height: 120,
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 20,
+                    backgroundColor: "#fff",
                     borderWidth: 1,
-                    borderColor: "#000",
+                    borderColor:
+                      isCorrect && a.word === randomSelection[current].word
+                        ? "#29CD9C"
+                        : "#dbdbdb",
                     borderRadius: 10,
                   }}
                   key={index}
                   onPress={() => onAnswer(a)}
                 >
+                  {isCorrect && a.word === randomSelection[current].word ? (
+                    <FontAwesome
+                      size={14}
+                      name="check-circle"
+                      color="#29CD9C"
+                    />
+                  ) : null}
                   <Text>{a.romaji}</Text>
                   <Text>{a.furigana}</Text>
 
