@@ -296,7 +296,18 @@ export default function App() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={clearAll}>
+      <TouchableOpacity
+        onPress={() =>
+          Alert.alert("Reset & Delete All Scores", "Are you sure?", [
+            {
+              text: "Cancel",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel",
+            },
+            { text: "OK", onPress: () => clearAll() },
+          ])
+        }
+      >
         <Text>Clear</Text>
       </TouchableOpacity>
     </View>

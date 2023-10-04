@@ -46,9 +46,16 @@ export default function Scoreboard() {
 
   return (
     <View>
-      <Text>
-        Completed: {vocabulary.filter((w) => w.score === 50).length} /{" "}
-        {vocabulary.length}
+      <Text
+        style={{
+          padding: 10,
+          fontWeight: 500,
+          backgroundColor: "#006adc",
+          color: "#fff",
+        }}
+      >
+        Completed: ({vocabulary.filter((w) => w.score === 50).length} /{" "}
+        {vocabulary.length})
       </Text>
       <FlatList
         onRefresh={() => getData()}
