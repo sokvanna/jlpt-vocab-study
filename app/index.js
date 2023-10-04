@@ -44,11 +44,23 @@ export default function App() {
     return selectedObjects;
   };
 
+  const getCombo = (arr) => {
+    const copyArry = [...arr];
+    const max = 40;
+    const diff = max - arr.length;
+    for (let i = 0; i < diff; i++) {
+      const randomIndex = Math.floor(Math.random() * vocabulary.length);
+      copyArry.concat(vocabulary[randomIndex]);
+    }
+    return copyArry;
+  };
+
   const handleRandomSelection = () => {
-    const newRandomSelection = getRandomObjects(
-      vocabulary.filter((w) => w.score < 10),
-      40
-    );
+    const wordArr =
+      vocabulary.filter((w) => w.score < 50).length >= 40
+        ? vocabulary.filter((w) => w.score < 50)
+        : getCombo(vocabulary.filter((w) => w.score < 50));
+    const newRandomSelection = getRandomObjects(wordArr, 40);
     const currentAnswer = newRandomSelection[0];
     setCurrent(0);
     setRandomSelection(newRandomSelection);
@@ -94,7 +106,11 @@ export default function App() {
       setIsCorrect(true);
       const vocabArry = [...vocabulary];
       const index = vocabulary.findIndex((v) => v.word === a.word);
-      vocabArry[index].score = Number(vocabArry[index].score) + 1;
+      vocabArry[index].score =
+        Number(vocabArry[index].score) === 50
+          ? Number(vocabArry[index].score)
+          : Number(vocabArry[index].score) + 1;
+
       setVocabulary(vocabArry);
       storeData(vocabArry);
     } else {

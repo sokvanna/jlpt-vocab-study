@@ -40,17 +40,23 @@ export default function Scoreboard() {
       >
         {word}
       </Text>
-      <Text>{score} / 10</Text>
+      <Text>{score} / 50</Text>
     </View>
   );
 
   return (
-    <FlatList
-      onRefresh={() => getData()}
-      data={vocabulary.sort((a, b) => b.score - a.score)}
-      renderItem={({ item }) => <Item word={item.word} score={item.score} />}
-      keyExtractor={(item) => item.word}
-      refreshing={isRefreshing}
-    />
+    <View>
+      <Text>
+        Completed: {vocabulary.filter((w) => w.score === 50).length} /{" "}
+        {vocabulary.length}
+      </Text>
+      <FlatList
+        onRefresh={() => getData()}
+        data={vocabulary.sort((a, b) => b.score - a.score)}
+        renderItem={({ item }) => <Item word={item.word} score={item.score} />}
+        keyExtractor={(item) => item.word}
+        refreshing={isRefreshing}
+      />
+    </View>
   );
 }
