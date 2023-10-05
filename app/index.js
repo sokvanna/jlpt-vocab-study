@@ -62,6 +62,7 @@ export default function App() {
         : getCombo(vocabulary.filter((w) => w.score < 50));
     const newRandomSelection = getRandomObjects(wordArr, 40);
     const currentAnswer = newRandomSelection[0];
+    setIsCorrect(undefined);
     setCurrent(0);
     setRandomSelection(newRandomSelection);
     getAnswers(currentAnswer);
@@ -133,13 +134,13 @@ export default function App() {
         setCurrent(nextCurrent);
       }, 1500);
     } else {
-      Alert.alert("Finished", "reshuffle to play again", [
+      Alert.alert("Finished", "Reshuffle to play again", [
         {
           text: "Cancel",
           onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
-        { text: "OK", onPress: () => console.log("OK Pressed") },
+        { text: "OK", onPress: () => handleRandomSelection() },
       ]);
     }
   };
@@ -180,8 +181,23 @@ export default function App() {
     return shuffledArray; // Return the shuffled array
   };
 
+  async function onFetchUpdateAsync() {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+      }
+    } catch (error) {
+      // You can also add an alert() to see the error message in case of an error when fetching updates.
+      alert(`Error fetching latest Expo update: ${error}`);
+    }
+  }
+
   useEffect(() => {
     getData();
+    onFetchUpdateAsync();
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "jlpt-vocab-study",
+    "name": "N3 Vocab",
     "slug": "jlpt-vocab-study",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,9 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -34,7 +32,13 @@
       }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-updates",
+        {
+          "username": "sokcrates"
+        }
+      ]
     ]
   }
 }
