@@ -4,6 +4,7 @@ import n3 from "../db/n3.json";
 import { TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Updates from "expo-updates";
 
 export default function App() {
   let fontSize = 50;
